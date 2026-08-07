@@ -15,3 +15,14 @@ model User {
   role      String   @default("customer")
   createdAt DateTime @default(now())
 }
+
+model Driver {
+  id          Int      @id @default(autoincrement())
+  name        String
+  phone       String   @unique
+  licenseNo   String   @unique
+  experience  Int
+  cabType     String
+  isAvailable Boolean  @default(true)
+  createdAt   DateTime @default(now())
+}
