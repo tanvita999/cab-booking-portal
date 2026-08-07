@@ -25,4 +25,20 @@ model Driver {
   cabType     String
   isAvailable Boolean  @default(true)
   createdAt   DateTime @default(now())
+
+  cab         Cab?
+}
+
+model Cab {
+  id          Int      @id @default(autoincrement())
+  vehicleNo   String   @unique
+  model       String
+  color       String
+  seats       Int
+  isAvailable Boolean  @default(true)
+
+  driverId    Int      @unique
+  driver       Driver   @relation(fields: [driverId], references: [id])
+
+  createdAt   DateTime @default(now())
 }
