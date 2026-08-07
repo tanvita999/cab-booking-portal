@@ -7,6 +7,7 @@ const userRoutes = require("./routes/userRoutes");
 const adminRoutes = require("./routes/adminRoutes");
 const driverRoutes = require("./routes/driverRoutes");
 const cabRoutes = require("./routes/cabRoutes");
+const bookingRoutes = require("./routes/bookingRoutes");
 
 const app = express();
 
@@ -27,6 +28,7 @@ app.use("/api/user", userRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/drivers", driverRoutes);
 app.use("/api/cabs", cabRoutes);
+app.use("/api/bookings", bookingRoutes);
 
 // ================= HOME =================
 app.get("/", (req, res) => {
