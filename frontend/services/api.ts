@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: "https://cab-booking-portal-2.onrender.com/api",
+  baseURL: "https://cab-booking-portal-3.onrender.com/api",
 });
 
 api.interceptors.request.use(
