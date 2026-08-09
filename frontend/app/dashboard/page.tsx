@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { Car, Users, CalendarCheck, MapPin, ArrowRight } from "lucide-react";
 
 export default function DashboardPage() {
@@ -46,7 +47,10 @@ export default function DashboardPage() {
         {/* Stats */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
           {/* Drivers */}
-          <div className="bg-white rounded-3xl p-6 shadow-md border border-purple-100 hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+          <Link
+            href="/drivers"
+            className="block bg-white rounded-3xl p-6 shadow-md border border-purple-100 hover:shadow-xl hover:-translate-y-1 transition-all duration-300"
+          >
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-gray-500 font-medium">Drivers</p>
@@ -65,10 +69,13 @@ export default function DashboardPage() {
               <span>Manage drivers</span>
               <ArrowRight size={18} />
             </div>
-          </div>
+          </Link>
 
           {/* Cabs */}
-          <div className="bg-white rounded-3xl p-6 shadow-md border border-indigo-100 hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+          <Link
+            href="/cabs"
+            className="block bg-white rounded-3xl p-6 shadow-md border border-indigo-100 hover:shadow-xl hover:-translate-y-1 transition-all duration-300"
+          >
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-gray-500 font-medium">Fleet</p>
@@ -85,10 +92,13 @@ export default function DashboardPage() {
               <span>Manage cabs</span>
               <ArrowRight size={18} />
             </div>
-          </div>
+          </Link>
 
           {/* Bookings */}
-          <div className="bg-white rounded-3xl p-6 shadow-md border border-pink-100 hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+          <Link
+            href="/bookings"
+            className="block bg-white rounded-3xl p-6 shadow-md border border-pink-100 hover:shadow-xl hover:-translate-y-1 transition-all duration-300"
+          >
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-gray-500 font-medium">Reservations</p>
@@ -107,7 +117,7 @@ export default function DashboardPage() {
               <span>Manage bookings</span>
               <ArrowRight size={18} />
             </div>
-          </div>
+          </Link>
         </div>
 
         {/* Bottom Welcome Card */}
@@ -133,6 +143,7 @@ export default function DashboardPage() {
 
           {/* Decorative circles */}
           <div className="absolute -right-16 -top-16 w-56 h-56 rounded-full bg-white/10" />
+
           <div className="absolute -right-5 -bottom-24 w-72 h-72 rounded-full bg-white/10" />
         </div>
       </main>
