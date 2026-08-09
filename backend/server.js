@@ -33,7 +33,7 @@ const frontendBuildPath = path.join(__dirname, "frontend/dist");
 app.use(express.static(frontendBuildPath));
 
 // Fallback route: Send index.html for any request that isn't an API route
-app.get("*", (req, res) => {
+app.get("/{*splat}", (req, res) => {
   res.sendFile(path.join(frontendBuildPath, "index.html"));
 });
 
