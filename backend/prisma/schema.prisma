@@ -12,7 +12,7 @@ model User {
   name      String
   email     String   @unique
   password  String
-  role      String   @default("customer")
+  role      String   @default("admin")
   createdAt DateTime @default(now())
 
   bookings  Booking[]
