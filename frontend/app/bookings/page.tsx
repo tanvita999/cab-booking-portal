@@ -16,7 +16,9 @@ import {
   XCircle,
   X,
   BookOpen,
+  Search,
 } from "lucide-react";
+
 import api from "@/services/api";
 import AuthGuard from "@/components/AuthGuard";
 
@@ -74,6 +76,13 @@ export default function BookingsPage() {
 
   const [editingBooking, setEditingBooking] = useState<Booking | null>(null);
 
+  // ================= SEARCH + FILTER =================
+
+  const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
+
+  // ================= FORM =================
+
   const {
     register,
     handleSubmit,
@@ -85,6 +94,8 @@ export default function BookingsPage() {
 
   const getBookings = async () => {
     try {
+      setLoading(true);
+
       const response = await api.get("/bookings");
 
       console.log("BOOKINGS RESPONSE:", response.data);
@@ -154,6 +165,8 @@ export default function BookingsPage() {
       reset();
 
       getBookings();
+      getDrivers();
+      getCabs();
     } catch (error) {
       console.log("CREATE BOOKING ERROR:", error);
 
@@ -195,6 +208,8 @@ export default function BookingsPage() {
       setEditingBooking(null);
 
       getBookings();
+      getDrivers();
+      getCabs();
     } catch (error) {
       console.log("UPDATE BOOKING ERROR:", error);
 
@@ -229,6 +244,8 @@ export default function BookingsPage() {
       alert("Booking deleted successfully!");
 
       getBookings();
+      getDrivers();
+      getCabs();
     } catch (error) {
       console.log("DELETE BOOKING ERROR:", error);
 
@@ -256,6 +273,24 @@ export default function BookingsPage() {
         return "bg-gray-100 text-gray-700";
     }
   };
+
+  // ================= SEARCH + FILTER =================
+
+  const filteredBookings = bookings.filter((booking) => {
+    const search = searchTerm.toLowerCase().trim();
+
+    const matchesSearch =
+      booking.pickup.toLowerCase().includes(search) ||
+      booking.destination.toLowerCase().includes(search) ||
+      booking.user?.name?.toLowerCase().includes(search) ||
+      booking.driver?.name?.toLowerCase().includes(search) ||
+      booking.cab?.vehicleNo?.toLowerCase().includes(search);
+
+    const matchesStatus =
+      statusFilter === "all" || booking.status?.toLowerCase() === statusFilter;
+
+    return matchesSearch && matchesStatus;
+  });
 
   return (
     <AuthGuard>
@@ -548,29 +583,72 @@ export default function BookingsPage() {
               <CalendarCheck size={18} className="text-purple-600" />
 
               <span className="font-semibold text-gray-700">
-                {bookings.length} Bookings
+                {filteredBookings.length} Bookings
               </span>
             </div>
           </div>
 
-          {/* ================= LOADING ================= */}
+          {/* ================= SEARCH + FILTER ================= */}
+
+          <div className="bg-white rounded-2xl shadow-md border border-purple-100 p-4 mb-6">
+            <div className="flex flex-col md:flex-row gap-4">
+              {/* Search */}
+
+              <div className="relative flex-1">
+                <Search
+                  size={20}
+                  className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
+                />
+
+                <input
+                  type="text"
+                  placeholder="Search pickup, destination, customer, driver or vehicle..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="w-full border border-gray-200 bg-gray-50 rounded-xl pl-12 pr-4 py-3 text-gray-900 outline-none focus:bg-white focus:ring-2 focus:ring-purple-500 transition"
+                />
+              </div>
+
+              {/* Status Filter */}
+
+              <select
+                value={statusFilter}
+                onChange={(e) => setStatusFilter(e.target.value)}
+                className="md:w-56 border border-gray-200 bg-gray-50 rounded-xl px-4 py-3 text-gray-900 outline-none focus:bg-white focus:ring-2 focus:ring-purple-500 transition"
+              >
+                <option value="all">All Bookings</option>
+
+                <option value="pending">Pending</option>
+
+                <option value="confirmed">Confirmed</option>
+
+                <option value="completed">Completed</option>
+
+                <option value="cancelled">Cancelled</option>
+              </select>
+            </div>
+          </div>
+
+          {/* ================= BOOKING LIST ================= */}
 
           {loading ? (
             <div className="bg-white rounded-2xl shadow-md p-8 text-center">
               <p className="text-gray-600 font-medium">Loading bookings...</p>
             </div>
-          ) : bookings.length === 0 ? (
+          ) : filteredBookings.length === 0 ? (
             <div className="bg-white rounded-2xl shadow-md p-10 text-center">
               <CalendarCheck
                 size={48}
                 className="mx-auto text-purple-400 mb-4"
               />
 
-              <p className="text-gray-600 font-medium">No bookings found.</p>
+              <p className="text-gray-600 font-medium">
+                No bookings match your search or filter.
+              </p>
             </div>
           ) : (
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {bookings.map((booking) => (
+              {filteredBookings.map((booking) => (
                 <div
                   key={booking.id}
                   className="bg-white/95 rounded-2xl shadow-lg border border-purple-100 p-6 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300"

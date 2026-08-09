@@ -11,6 +11,7 @@ import {
   Pencil,
   CheckCircle,
   X,
+  Search,
 } from "lucide-react";
 import api from "@/services/api";
 import AuthGuard from "@/components/AuthGuard";
@@ -57,6 +58,11 @@ export default function CabsPage() {
   const [editingCab, setEditingCab] = useState<Cab | null>(null);
   const [updating, setUpdating] = useState(false);
 
+  // ================= SEARCH + FILTER =================
+
+  const [searchTerm, setSearchTerm] = useState("");
+  const [availabilityFilter, setAvailabilityFilter] = useState("all");
+
   // ================= ADD CAB FORM =================
 
   const {
@@ -78,6 +84,8 @@ export default function CabsPage() {
 
   const getCabs = async () => {
     try {
+      setLoading(true);
+
       const response = await api.get("/cabs");
 
       console.log("CABS RESPONSE:", response.data);
@@ -132,6 +140,7 @@ export default function CabsPage() {
       reset();
 
       getCabs();
+      getDrivers();
     } catch (error) {
       console.log("ADD CAB ERROR:", error);
 
@@ -176,8 +185,7 @@ export default function CabsPage() {
         color: data.color,
         seats: Number(data.seats),
 
-        // IMPORTANT:
-        // Convert the select value into a real boolean
+        // Convert select value into boolean
         isAvailable: data.isAvailable,
       });
 
@@ -188,6 +196,7 @@ export default function CabsPage() {
       setEditingCab(null);
 
       getCabs();
+      getDrivers();
     } catch (error) {
       console.log("UPDATE CAB ERROR:", error);
 
@@ -202,6 +211,25 @@ export default function CabsPage() {
   const cancelEdit = () => {
     setEditingCab(null);
   };
+
+  // ================= SEARCH + FILTER =================
+
+  const filteredCabs = cabs.filter((cab) => {
+    const search = searchTerm.toLowerCase().trim();
+
+    const matchesSearch =
+      cab.vehicleNo.toLowerCase().includes(search) ||
+      cab.model.toLowerCase().includes(search) ||
+      cab.color.toLowerCase().includes(search) ||
+      cab.driver.name.toLowerCase().includes(search);
+
+    const matchesAvailability =
+      availabilityFilter === "all" ||
+      (availabilityFilter === "available" && cab.isAvailable) ||
+      (availabilityFilter === "unavailable" && !cab.isAvailable);
+
+    return matchesSearch && matchesAvailability;
+  });
 
   return (
     <AuthGuard>
@@ -556,8 +584,45 @@ export default function CabsPage() {
               <Users size={18} className="text-purple-600" />
 
               <span className="font-semibold text-gray-700">
-                {cabs.length} Cabs
+                {filteredCabs.length} Cabs
               </span>
+            </div>
+          </div>
+
+          {/* ================= SEARCH + FILTER ================= */}
+
+          <div className="bg-white rounded-2xl shadow-md border border-purple-100 p-4 mb-6">
+            <div className="flex flex-col md:flex-row gap-4">
+              {/* Search */}
+
+              <div className="relative flex-1">
+                <Search
+                  size={20}
+                  className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
+                />
+
+                <input
+                  type="text"
+                  placeholder="Search by vehicle, model, color or driver..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="w-full border border-gray-200 bg-gray-50 rounded-xl pl-12 pr-4 py-3 text-gray-900 outline-none focus:bg-white focus:ring-2 focus:ring-purple-500 transition"
+                />
+              </div>
+
+              {/* Availability Filter */}
+
+              <select
+                value={availabilityFilter}
+                onChange={(e) => setAvailabilityFilter(e.target.value)}
+                className="md:w-56 border border-gray-200 bg-gray-50 rounded-xl px-4 py-3 text-gray-900 outline-none focus:bg-white focus:ring-2 focus:ring-purple-500 transition"
+              >
+                <option value="all">All Cabs</option>
+
+                <option value="available">Available</option>
+
+                <option value="unavailable">Not Available</option>
+              </select>
             </div>
           </div>
 
@@ -567,15 +632,17 @@ export default function CabsPage() {
             <div className="bg-white rounded-2xl shadow-md p-8 text-center">
               <p className="text-gray-600 font-medium">Loading cabs...</p>
             </div>
-          ) : cabs.length === 0 ? (
+          ) : filteredCabs.length === 0 ? (
             <div className="bg-white rounded-2xl shadow-md p-10 text-center">
               <Car size={48} className="mx-auto text-purple-400 mb-4" />
 
-              <p className="text-gray-600 font-medium">No cabs found.</p>
+              <p className="text-gray-600 font-medium">
+                No cabs match your search or filter.
+              </p>
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {cabs.map((cab) => (
+              {filteredCabs.map((cab) => (
                 <div
                   key={cab.id}
                   className="group bg-white/95 rounded-2xl shadow-lg border border-purple-100 p-6 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300"
